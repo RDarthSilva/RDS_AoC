@@ -27,20 +27,48 @@ package problems;
  *
  * Scan the corrupted memory for uncorrupted mul instructions. What do you get if you add up all of the results of the
  * multiplications?
- * ANSWER:
+ * ANSWER: 162813399
+ *
+ *
+ *
+ * --- Part Two ---
+ * As you scan through the corrupted memory, you notice that some of the conditional statements are also still intact.
+ * If you handle some of the uncorrupted conditional statements in the program, you might be able to get an even more
+ * accurate result.
+ *
+ * There are two new instructions you'll need to handle:
+ * - The do() instruction enables future mul instructions.
+ * - The don't() instruction disables future mul instructions.
+ *
+ * Only the most recent do() or don't() instruction applies. At the beginning of the program, mul instructions are
+ * enabled.
+ *
+ * For example:
+ * xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
+ *
+ * This corrupted memory is similar to the example from before, but this time the mul(5,5) and mul(11,8) instructions
+ * are disabled because there is a don't() instruction before them. The other mul instructions function normally,
+ * including the one at the end that gets re-enabled by a do() instruction.
+ *
+ * This time, the sum of the results is 48 (2*4 + 8*5).
+ *
+ * Handle the new instructions; what do you get if you add up all of the results of just the enabled multiplications?
+ * ANSWER: 53783319
  */
 
 import templates.Day;
 import tools.Log;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Day03 extends Day {
 
     static final int DAY = 3 ;
-    static final boolean DEBUG = true ;
-    static final String FILE_NAME = "Example" ;
-    //static final String FILE_NAME = "Input" ;
+    static final boolean DEBUG = false ;
+    //static final String FILE_NAME = "Example" ;
+    //static final String FILE_NAME = "Example2" ;
+    static final String FILE_NAME = "Input" ;
 
     public Day03(Log log) {
         super(log, DAY, FILE_NAME);
@@ -61,6 +89,7 @@ public class Day03 extends Day {
         // Declare variables:
         ArrayList<Mull> mulls = new ArrayList<>();
         String sub;
+        Mull mull;
 
         // Process Line
         String corruptedLine = input.next();
@@ -68,20 +97,87 @@ public class Day03 extends Day {
             if(corruptedLine.charAt(n) == 'm') {
                 sub = corruptedLine.substring(n);
                 sub = sub.substring(0,sub.indexOf(')')+1);
-                if(DEBUG) log.write("Evaluating " + sub);
+                mull = null;
+                if(sub.length()>7) mull = getMull(sub);
+                if(mull != null) mulls.add(mull);
             }
         }
+
+        // Calculate Mulls:
+        int sum = 0;
+        Iterator<Mull> i = mulls.iterator();
+        while(i.hasNext()) sum += i.next().getMull();
+
+        log.write("Sum of Mulls: " + sum);
     }
 
     public void executePart2() {
         super.executePart2();
 
-        // CODE HERE (Part 2)
-        //while(input.hasNext()) {
-        //    log.write(input.next());
-        //}
+        // Declare variables:
+        ArrayList<Mull> mulls = new ArrayList<>();
+        boolean enabled = true;
+        String sub;
+        Mull mull;
+
+        // Process Line
+        String corruptedLine = input.next();
+        for (int n=0; n<corruptedLine.length(); n++) {
+            if(corruptedLine.charAt(n) == 'd') {
+                sub = corruptedLine.substring(n);
+                sub = sub.substring(0,sub.indexOf(')')+1);
+                if(isDont(sub)) enabled = false;
+                if(isDo(sub)) enabled = true;
+            }
+            if(enabled) {
+                if (corruptedLine.charAt(n) == 'm') {
+                    sub = corruptedLine.substring(n);
+                    sub = sub.substring(0, sub.indexOf(')') + 1);
+                    mull = null;
+                    if (sub.length() > 7) mull = getMull(sub);
+                    if (mull != null) mulls.add(mull);
+                }
+            }
+        }
+
+        // Calculate Mulls:
+        int sum = 0;
+        Iterator<Mull> i = mulls.iterator();
+        while(i.hasNext()) sum += i.next().getMull();
+
+        log.write("Sum of Mulls: " + sum);
     }
 
+    public Mull getMull(String sub) {
+        if(DEBUG) log.write("Evaluating " + sub);
+        // Mul( X ):
+        if(sub.substring(0,4).equals("mul(")) {
+            sub = sub.substring(4,sub.length()-1);
+            //if(DEBUG) log.write("- op ok, now evaluating " + sub);
+        } else return null;
+
+        // X = Split and Digits:
+        int split = sub.indexOf(',');
+        if(split == -1) return null;
+        int n1,n2;
+
+        try {
+            n1 = Integer.parseInt(sub.substring(0,split));
+            n2 = Integer.parseInt(sub.substring(split+1));
+        } catch(NumberFormatException e) { return null; }
+
+        return new Mull(n1,n2);
+    }
+
+    public boolean isDont(String sub) {
+        if(DEBUG) log.write("Evaluating " + sub);
+        return sub.equals("don't()");
+    }
+
+    public boolean isDo(String sub) {
+        if(DEBUG) log.write("Evaluating " + sub);
+        return sub.equals("do()");
+    }
     class Mull {
         private int n1;
         private int n2;
@@ -90,5 +186,7 @@ public class Day03 extends Day {
             this.n1 = n1;
             this.n2 = n2;
         }
+
+        public int getMull() { return n1*n2; }
     }
 }

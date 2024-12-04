@@ -4,6 +4,8 @@ public class Convert {
 
     public static int toInt(String s) { return Integer.parseInt(s) ; }
     public static long toLong(String s) { return Long.parseLong(s) ; }
+
+    public static char toChar(int n) { return (char) n ; }
     public static String toString(int n) {
         return "" + n ;
     }
