@@ -244,30 +244,6 @@ public class Day04 extends Day {
         Iterator<XMatrixCell> i = starters.iterator();
         while(i.hasNext()) if(i.next().isX_MAS()) count++;
         log.write("X-MAS Count: " + count);
-
-        // Print XMAS Matrix:
-        /*if(DEBUG) {
-            for(l=0;l<matrix.length;l++) {
-                line = "";
-                for (c = 0; c < matrix[l].length; c++) {
-                    line += matrix[l][c].getInvolved();
-                }
-                log.write(line);
-            }
-            log.write("");
-        }*/
-
-        // Print XMAS Matrix Counts:
-        /*if(DEBUG) {
-            for(l=0;l<matrix.length;l++) {
-                line = "";
-                for (c = 0; c < matrix[l].length; c++) {
-                    line += "[" + Convert.toString(matrix[l][c].getXMASCount(),2) + "]";
-                }
-                log.write(line);
-            }
-            log.write("");
-        }*/
     }
 
     class XMatrixCell {
