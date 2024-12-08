@@ -81,8 +81,8 @@ public class Day07 extends Day {
 
     static final int DAY = 7 ;
     static final boolean DEBUG = false ;
-    static final String FILE_NAME = "Example" ;
-    //static final String FILE_NAME = "Input" ;
+    //static final String FILE_NAME = "Example" ;
+    static final String FILE_NAME = "Input" ;
 
     public Day07(Log log) {
         super(log, DAY, FILE_NAME);
